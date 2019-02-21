@@ -1,11 +1,15 @@
 {
 	"name": "Redis Cache",
-	"version": "1.0",
+	"version": "1.0.0",
 	"author": [
 		"Alexia E. Smtih"
 	],
 	"descriptionmsg": "rediscache_description",
-	"type": "specialpage",
+	"license-name": "GPL-3.0-only",
+	"type": "other",
+	"requires": {
+		"MediaWiki": ">= 1.29.0"
+	},
 	"MessagesDirs": {
 		"RedisCache": [
 			"i18n"

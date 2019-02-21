@@ -5,9 +5,9 @@
  *
  * @author		Alexia E. Smith
  * @copyright	(c) 2015 Curse Inc.
- * @license		GPLv3
+ * @license		GNU General Public License v3.0 only
  * @package		RedisCache
- * @link		http://www.curse.com/
+ * @link		https://gitlab.com/hydrawiki
  *
 **/
 
@@ -30,7 +30,7 @@ class RedisCache {
 	 * Acquire a Redis connection.
 	 *
 	 * @access	protected
-	 * @param	string	[Optiona] Server group key. 
+	 * @param	string	[Optional] Server group key.
 	 * 					Example: 'cache' would look up $wgRedisServers['cached']
 	 *					Default: Uses the first index of $wgRedisServers.
 	 * @param	array	[Optional] Additional options, will merge and overwrite default options.
@@ -60,6 +60,10 @@ class RedisCache {
 			$group = 0;
 			$server = current($wgRedisServers);
 		} else {
+			if (!isset($wgRedisServers[$group])) {
+				wfDebug(__METHOD__.' - Missing Redis server group: '.$group);
+				return false;
+			}
 			$server = $wgRedisServers[$group];
 		}
 
@@ -74,9 +78,9 @@ class RedisCache {
 		$pool = \RedisConnectionPool::singleton(array_merge($server['options'], $options));
 		$redis = $pool->getConnection($server['host'].":".$server['port']); //Concatenate these together for MediaWiki weirdness so it can split them later.
 
-		if ($redis instanceOf RedisConnRef) {
+		if ($redis instanceof RedisConnRef) {
 			//Set up any extra options.  RedisConnectionPool does not handle the prefix automatically.
-			if (!empty($server['options']['prefix'])) {
+			if (isset($server['options']['prefix']) && !empty($server['options']['prefix'])) {
 				$redis->setOption(Redis::OPT_PREFIX, $server['options']['prefix']);
 			}
 			try {
