@@ -2,7 +2,7 @@
 	"name": "Redis Cache",
 	"version": "1.0.0",
 	"author": [
-		"Alexia E. Smtih"
+		"Alexia E. Smith"
 	],
 	"descriptionmsg": "rediscache_description",
 	"license-name": "GPL-3.0-only",
