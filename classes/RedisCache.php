@@ -15,7 +15,7 @@ class RedisCache {
 	/**
 	 * Up and ready server connections.
 	 *
-	 * @var		boolean
+	 * @var		array
 	 */
 	static protected $servers = [];
 
@@ -85,7 +85,8 @@ class RedisCache {
 			}
 			try {
 				$pong = $redis->ping();
-				if ($pong === '+PONG') {
+				// Prior to redis version 5 ping would return the string +PONG but will now return true
+				if ($pong === '+PONG' || $pong === true) {
 					self::$servers[$group] = $redis;
 				} else {
 					$redis = false;
