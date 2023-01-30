@@ -16,7 +16,8 @@
 		]
 	},
 	"AutoloadClasses": {
-		"RedisCache": "classes/RedisCache.php"
+		"RedisCache": "src/RedisCache.php"
 	},
+	"ServiceWiringFiles": ["ServiceWiring.php"],
 	"manifest_version": 1
 }
