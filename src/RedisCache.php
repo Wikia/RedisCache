@@ -2,6 +2,7 @@
 
 use MediaWiki\MediaWikiServices;
 use Psr\Log\LoggerInterface;
+use Wikimedia\Assert\Assert;
 
 /**
  * Curse Inc.
@@ -48,15 +49,15 @@ class RedisCache {
 		?array $options = [],
 		?bool $newConnection = false
 	): ?RedisConnRef {
-		if ( !extension_loaded( 'redis' ) ) {
-			throw new MWException(
-				__METHOD__ .
-				" - The PHP Redis extension is not available.  Please enable it on the server to use RedisCache."
-			);
-		}
+		Assert::precondition(
+			extension_loaded( 'redis' ),
+			__METHOD__ .
+			" - The PHP Redis extension is not available.  Please enable it on the server to use RedisCache."
+		);
 
 		if ( empty( $this->redisServers ) || !is_array( $this->redisServers ) ) {
 			$this->logger->error( "redisServers must be configured for RedisCache to function." );
+
 			return null;
 		}
 
@@ -66,6 +67,7 @@ class RedisCache {
 		} else {
 			if ( !isset( $this->redisServers[$group] ) ) {
 				$this->logger->error( 'Missing Redis server group: ' . $group );
+
 				return null;
 			}
 			$server = $this->redisServers[$group];
@@ -82,7 +84,7 @@ class RedisCache {
 		$pool = \RedisConnectionPool::singleton( array_merge( $server['options'], $options ) );
 		/** @var RedisConnRef|Redis|bool $redis */
 		$redis = $pool->getConnection(
-		//Concatenate these together for MediaWiki weirdness so it can split them later.
+		// Concatenate these together for MediaWiki weirdness so it can split them later.
 			$server['host'] . ":" . $server['port']
 		);
 
@@ -91,7 +93,8 @@ class RedisCache {
 		}
 
 		if ( $redis instanceof RedisConnRef ) {
-			//Set up any extra options. RedisConnectionPool does not handle the prefix automatically.
+			// Set up any extra options. RedisConnectionPool does not handle the prefix
+			// automatically.
 			if ( isset( $server['options']['prefix'] ) && !empty( $server['options']['prefix'] ) ) {
 				$redis->setOption( Redis::OPT_PREFIX, $server['options']['prefix'] );
 			}
@@ -103,10 +106,11 @@ class RedisCache {
 				} else {
 					return null;
 				}
-			}
-			catch ( RedisException $e ) {
-				//People using HAProxy will find it will lie about a Redis cluster being healthy when the master is down, but the slaves are up.  Doing a PING will cause an immediate disconnect.
+			} catch ( RedisException $e ) {
+				// People using HAProxy will find it will lie about a Redis cluster being healthy
+				// when the master is down, but the slaves are up.  Doing a PING will cause an immediate disconnect.
 				$this->lastError = $e->getMessage();
+
 				return null;
 			}
 		}
@@ -119,8 +123,10 @@ class RedisCache {
 	 * @throws MWException
 	 * @deprecated swap static class usage for injecting RedisCache and calling getConnection directly
 	 */
-	static public function getClient( ?string $group = null ): ?RedisConnRef {
-		return MediaWikiServices::getInstance()->getService( RedisCache::class )->getConnection( $group );
+	public static function getClient( ?string $group = null ): ?RedisConnRef {
+		return MediaWikiServices::getInstance()->getService( self::class )->getConnection(
+			$group
+		);
 	}
 
 	/**
