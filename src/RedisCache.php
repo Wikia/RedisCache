@@ -55,7 +55,7 @@ class RedisCache {
 			" - The PHP Redis extension is not available.  Please enable it on the server to use RedisCache."
 		);
 
-		if ( empty( $this->redisServers ) || !is_array( $this->redisServers ) ) {
+		if ( empty( $this->redisServers ) ) {
 			$this->logger->error( "redisServers must be configured for RedisCache to function." );
 
 			return null;
@@ -81,7 +81,7 @@ class RedisCache {
 			throw new MWException( __METHOD__ . " - An invalid server group key was passed." );
 		}
 
-		$pool = \RedisConnectionPool::singleton( array_merge( $server['options'], $options ) );
+		$pool = RedisConnectionPool::singleton( array_merge( $server['options'], $options ?? [] ) );
 		/** @var RedisConnRef|Redis|bool $redis */
 		$redis = $pool->getConnection(
 		// Concatenate these together for MediaWiki weirdness so it can split them later.
