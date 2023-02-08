@@ -8,15 +8,23 @@
 	"license-name": "GPL-3.0-only",
 	"type": "other",
 	"requires": {
-		"MediaWiki": ">= 1.29.0"
+		"MediaWiki": ">= 1.39.0"
 	},
 	"MessagesDirs": {
 		"RedisCache": [
 			"i18n"
 		]
 	},
-	"AutoloadClasses": {
-		"RedisCache": "classes/RedisCache.php"
+	"config": {
+		"RedisServers": {
+			"description": "Configuration of RedisServers",
+			"public": true,
+			"value": null
+		}
 	},
-	"manifest_version": 1
+	"AutoloadClasses": {
+		"RedisCache": "src/RedisCache.php"
+	},
+	"ServiceWiringFiles": ["ServiceWiring.php"],
+	"manifest_version": 2
 }
